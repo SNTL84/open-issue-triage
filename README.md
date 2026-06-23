@@ -57,6 +57,75 @@ When I respond to an open issue, I:
 
 ---
 
+## 💰 Bounty Issues — Active Attempt List
+
+> Tracking high-value open-source bounties aligned with my stack. Updated regularly. Issues range from **$75 to $20,000+**.
+
+### 🎯 archestra-ai/archestra
+
+| # | Issue | Bounty | Difficulty | Skills |
+|---|-------|--------|------------|--------|
+| 1 | [#4998 — Add Sorting Hat MCP server](https://github.com/archestra-ai/archestra/issues/4998) | $4,000 | Medium | AI / n8n / Next.js |
+| 2 | [#3855 — Create WindMill MCP Apps server](https://github.com/archestra-ai/archestra/issues/3855) | $400 | Medium | Automation |
+| 3 | [Improve usage limits UX/DX](https://github.com/archestra-ai/archestra/issues) | $150 | Easy | React / UX |
+| 4 | [#3858 — Agent template catalog](https://github.com/archestra-ai/archestra/issues/3858) | $450 | Medium | Full Stack / AI |
+| 5 | [#3218 — Jira + Confluence ACL sync](https://github.com/archestra-ai/archestra/issues/3218) | $150 | Medium | Node.js / API |
+| 6 | [#4758 — Improve UX limits visibility](https://github.com/archestra-ai/archestra/issues/4758) | $150 | Easy | React / Next.js |
+
+---
+
+### 🎯 BasedHardware/omi
+
+| # | Issue | Bounty | Difficulty | Skills |
+|---|-------|--------|------------|--------|
+| 7 | [#1944 — Rebuild app in React Native](https://github.com/BasedHardware/omi/issues/1944) | $20,000 | Hard | Full Stack |
+| 8 | [#2008 — Make omi work in browser](https://github.com/BasedHardware/omi/issues/2008) | $1,500 | Medium | Next.js / Web |
+| 9 | [#2316 — Send Uber app](https://github.com/BasedHardware/omi/issues/2316) | $1,000 | Medium | Node.js |
+| 10 | [Send Emails app](https://github.com/BasedHardware/omi/issues) | $300 | Easy | Node.js / API |
+| 11 | [#619 — Apple Watch Integration](https://github.com/BasedHardware/omi/issues/619) | $2,000 | Medium | API / Mobile |
+| 12 | [#1980 — Google Calendar](https://github.com/BasedHardware/omi/issues/1980) | $300 | Easy | API Integration |
+
+---
+
+### 🎯 PrimeIntellect-ai
+
+| # | Issue | Bounty | Difficulty | Skills |
+|---|-------|--------|------------|--------|
+| 13 | [ART-E mail agent](https://github.com/PrimeIntellect-ai) | $200–$800 | Easy–Hard | AI / Automation |
+| 14 | [SWE-Swiss RL pipeline](https://github.com/PrimeIntellect-ai) | $400–$800 | Medium–Hard | ML / Python |
+
+---
+
+### 🎯 tscircuit
+
+| # | Issue | Bounty | Difficulty | Skills |
+|---|-------|--------|------------|--------|
+| 15 | [Fix schematic trace bugs](https://github.com/tscircuit/tscircuit/issues) | $75 each | Easy | TypeScript / EDA |
+
+---
+
+### 🎯 CatchTheSignal — GitHub Opportunities Aggregator
+
+| # | Project | Bounty Range | Scope |
+|---|---------|-------------|-------|
+| 16 | [GitHub Opportunities Aggregator](https://github.com/CatchTheSignal) | $100–$10k+ | Tracks $100–$10k+ issues hourly, good first issues for portfolio, and sponsored projects for recurring income |
+
+---
+
+### 📊 Bounty Summary
+
+| Repo | Issues | Total Potential |
+|------|--------|----------------|
+| archestra-ai/archestra | 6 | ~$5,300 |
+| BasedHardware/omi | 6 | ~$25,100 |
+| PrimeIntellect-ai | 2 | ~$600–$1,600 |
+| tscircuit | Multiple | $75+ each |
+| CatchTheSignal | Ongoing | $100–$10k+ |
+
+> 💡 **Strategy:** Start with Easy issues ($150–$300) to build contributor trust, then move to Medium/Hard for larger bounties.
+
+---
+
 ## 📋 Issue Response Log
 
 ### 🚀 [ishandutta2007/Velocity](https://github.com/ishandutta2007/Velocity)
