@@ -5,7 +5,7 @@
 
 <br/>
 
-<!-- PROFILE IMAGE ROW -->
+<!-- PROFILE IMAGE -->
 <img src="https://avatars.githubusercontent.com/u/247395324?v=4" width="100" height="100" style="border-radius:50%" alt="Golden Lotus - SNTL84"/>
 
 <br/><br/>
@@ -20,6 +20,7 @@
 [![Website](https://img.shields.io/badge/🌐_Website-desidevioper.com-01696f?style=for-the-badge)](https://desidevioper.com)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-sntl2784-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/sntl2784)
 [![GitHub](https://img.shields.io/badge/GitHub-SNTL84-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/SNTL84)
+[![Instagram](https://img.shields.io/badge/Instagram-@desibiztrade-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://www.instagram.com/desibiztrade)
 [![WhatsApp](https://img.shields.io/badge/WhatsApp-Chat_Now-25D366?style=for-the-badge&logo=whatsapp&logoColor=white)](https://wa.me/919727413309)
 [![Email](https://img.shields.io/badge/Email-3goldenlotusroots-EA4335?style=for-the-badge&logo=gmail&logoColor=white)](mailto:3goldenlotusroots@gmail.com)
 [![Aratt.ai](https://img.shields.io/badge/Aratt.ai-@desidevloper-ff6b35?style=for-the-badge)](https://aratt.ai/user/@desidevloper)
@@ -126,10 +127,10 @@ If you're a **maintainer** looking for a reliable contributor, or a **founder/op
 | 🌐 Website | [desidevioper.com](https://desidevioper.com) |
 | 💼 LinkedIn | [linkedin.com/in/sntl2784](https://www.linkedin.com/in/sntl2784) |
 | 🐙 GitHub | [github.com/SNTL84](https://github.com/SNTL84) |
+| 📸 Instagram | [@desibiztrade](https://www.instagram.com/desibiztrade) |
 | 💬 WhatsApp | [wa.me/919727413309](https://wa.me/919727413309) |
 | 📧 Email | [3goldenlotusroots@gmail.com](mailto:3goldenlotusroots@gmail.com) |
 | 🔴 YouTube | [@SNTL84](https://youtube.com/@SNTL84) |
-| 📸 Instagram | [@desibiztrade](https://www.instagram.com/desibiztrade) |
 | 🤖 Aratt.ai | [@desidevloper](https://aratt.ai/user/@desidevloper) |
 
 ---
