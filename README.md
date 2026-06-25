@@ -65,6 +65,130 @@ When I respond to an open issue, I:
 
 ## 🔥 Featured Fix — Latest Contributions
 
+---
+
+<div align="center">
+
+### ⚛️ [`calcom/cal.diy`](https://github.com/calcom/cal.diy) · Issue [#28979](https://github.com/calcom/cal.com/issues/28979) · **PR [#29643](https://github.com/calcom/cal.diy/pull/29643)**
+
+**`[embed-react] config/theme prop silently ignored after initial mount — useRef guard short-circuits reactive updates`**
+
+![React](https://img.shields.io/badge/React-Hooks_/_Embed-61DAFB?style=flat-square&logo=react&logoColor=black)
+![cal.com](https://img.shields.io/badge/@calcom%2Fembed--react-v1.5.3-0055FF?style=flat-square)
+![Status](https://img.shields.io/badge/Status-PR_Open_%2329643-01696f?style=flat-square)
+![Effort](https://img.shields.io/badge/Effort-~2_Hours-yellow?style=flat-square)
+![Priority](https://img.shields.io/badge/Impact-HIGH-red?style=flat-square)
+![Session](https://img.shields.io/badge/Session-Jun_25_2026-4f98a3?style=flat-square)
+
+> ⚛️ **React embed bug** — `config` prop (incl. `theme`) changes after first mount have zero effect. Root cause: `useRef` guard `initializedRef.current` short-circuits every `useEffect` re-run, making the `config` dep array entry a silent no-op. Affects **all `<Cal />` inline embed users** with dynamic theme/config.
+
+</div>
+
+---
+
+### 📋 Session Timeline — Jun 25, 2026
+
+| Time (IST) | Action | Link |
+|------------|--------|------|
+| 2:56 PM | 🔍 Issue read & root cause confirmed | [Issue #28979](https://github.com/calcom/cal.com/issues/28979) |
+| 2:57 PM | 💬 Maintainer-level triage comment posted (3 fix options, test cases, file table) | [Comment →](https://github.com/calcom/cal.diy/issues/28979#issuecomment-4797753409) |
+| 3:13 PM | 🍴 Fork initiated — `calcom/cal.diy` → `SNTL84/cal.diy` | [Fork →](https://github.com/SNTL84/cal.diy) |
+| 3:20 PM | 🌿 Fix branch created — `fix/embed-react-config-prop-ignored-after-mount` | [Branch →](https://github.com/SNTL84/cal.diy/tree/fix/embed-react-config-prop-ignored-after-mount) |
+| 3:20 PM | 🔧 Actual source fix committed to `packages/embeds/embed-react/src/Cal.tsx` | [Commit 3a3f422 →](https://github.com/SNTL84/cal.diy/commit/3a3f4223b46bf77b8c4e79ffdf27359dbb6fab81) |
+| 3:25 PM | 🚀 Draft PR opened → `calcom/cal.diy` main | [PR #29643 →](https://github.com/calcom/cal.diy/pull/29643) |
+| 3:25 PM | 📝 Profile README updated — `@calcom/embed-react Specialist` badge + section | [SNTL84/SNTL84 →](https://github.com/SNTL84/SNTL84/commit/ef6e239b77ce5dc9dbf6d143e0a1ea5c956930c6) |
+
+---
+
+### 🔎 Root Cause — `packages/embeds/embed-react/src/Cal.tsx`
+
+```tsx
+// ❌ BEFORE — single useEffect, guard kills all re-runs
+useEffect(() => {
+  if (!Cal || initializedRef.current || !ref.current) {
+    return; // ← fires on EVERY run after mount — config changes swallowed
+  }
+  initializedRef.current = true;
+  Cal("inline", { elementOrSelector: element, calLink, config });
+}, [Cal, calLink, config, namespace, calOrigin, initConfig]);
+//                ^^^^^^
+// config IS in dep array — React re-runs correctly
+// BUT guard returns early every time → dep entry is a no-op
+```
+
+**The `initializedRef` guard is correct for preventing double-init (React Strict Mode) but wrong as a general re-run gate.**
+
+---
+
+### ✅ The Fix — Split Effects
+
+```tsx
+// ✅ AFTER — Effect 1: One-time init (guard valid here)
+// config + calLink intentionally excluded from deps
+useEffect(() => {
+  if (!Cal || initializedRef.current || !ref.current) return;
+  initializedRef.current = true;
+  Cal("inline", { elementOrSelector: element, calLink, config });
+}, [Cal, namespace, calOrigin, initConfig]); // ← config excluded
+
+// ✅ Effect 2: Reactive config/calLink updates (no guard)
+useEffect(() => {
+  if (!Cal || !initializedRef.current) return; // skip before init
+  Cal("ui", { ...config }); // update embed without remount or iframe flash
+}, [Cal, namespace, config, calLink]); // ← config reactive here
+```
+
+**Why this wins:**
+
+| Approach | Init safety | Config reactive | UX flash | Code clarity |
+|----------|------------|-----------------|----------|--------------|
+| ❌ Original (single effect + guard) | ✅ | ❌ Silent fail | None | ⚠️ Misleading deps |
+| ⚠️ `key={resolvedTheme}` workaround | ✅ | ✅ | ❌ iframe reload | ⚠️ Caller burden |
+| ✅ **Split effects (this PR)** | ✅ | ✅ | ✅ None | ✅ Clean separation |
+
+---
+
+### 📦 Files Changed
+
+| File | Change |
+|------|--------|
+| `packages/embeds/embed-react/src/Cal.tsx` | Split single `useEffect` → 2 effects: init-only + reactive config update |
+
+---
+
+### 🧪 Test Plan (in PR)
+
+- [ ] Mount `<Cal calLink="demo" config={{ theme: "light" }} />`
+- [ ] Change `config.theme` to `"dark"` while mounted — embed updates **without iframe reload**
+- [ ] Init fires exactly **once** — no double-init on config change
+- [ ] React Strict Mode double-invocation safe
+- [ ] `namespace` prop path works identically in both effects
+
+---
+
+### 🔗 All Links — calcom Session
+
+| Asset | Link |
+|-------|------|
+| 📌 Issue | [calcom/cal.com #28979](https://github.com/calcom/cal.com/issues/28979) |
+| 💬 Triage Comment | [#issuecomment-4797753409](https://github.com/calcom/cal.diy/issues/28979#issuecomment-4797753409) |
+| 🍴 Fork | [SNTL84/cal.diy](https://github.com/SNTL84/cal.diy) |
+| 🌿 Fix Branch | [fix/embed-react-config-prop-ignored-after-mount](https://github.com/SNTL84/cal.diy/tree/fix/embed-react-config-prop-ignored-after-mount) |
+| 🔧 Fix Commit | [3a3f4223b46bf77b8c4e79ffdf27359dbb6fab81](https://github.com/SNTL84/cal.diy/commit/3a3f4223b46bf77b8c4e79ffdf27359dbb6fab81) |
+| 🚀 Draft PR | [calcom/cal.diy #29643](https://github.com/calcom/cal.diy/pull/29643) |
+| 👤 Profile README | [SNTL84/SNTL84 — embed-react specialist section](https://github.com/SNTL84/SNTL84/blob/main/README.md) |
+
+---
+
+### 🏷️ CTA Watermark
+
+> **SNTL 2784** | Agentic AI Workflow Professional
+> Full-Stack Builds · AI Workflows · Lead Generation Automation · Supply Chain BI
+>
+> 🌐 [desidevloper.com](https://desidevloper.com) · 💬 [WhatsApp](https://wa.me/919727413309) · 🔗 [LinkedIn](https://linkedin.com/in/sntl2784) · 📸 [Instagram @desibiztrade](https://www.instagram.com/desibiztrade) · 🔴 [YouTube @SNTL84](https://youtube.com/@SNTL84) · 💻 [GitHub SNTL84](https://github.com/SNTL84)
+
+---
+
 <div align="center">
 
 ### 🧩 [`type-challenges/type-challenges`](https://github.com/type-challenges/type-challenges) · Issue [#38224](https://github.com/type-challenges/type-challenges/issues/38224)
@@ -101,17 +225,11 @@ When I respond to an open issue, I:
 **The enhanced solution:**
 
 ```ts
-/**
- * ✅ Enhanced MinusOne — TypeScript 4.8+
- * Strategy: decimal string subtraction with borrow propagation
- */
-
 type PrevDigit = {
   '0': '9'; '1': '0'; '2': '1'; '3': '2'; '4': '3';
   '5': '4'; '6': '5'; '7': '6'; '8': '7'; '9': '8';
 }
 
-// Generic: splits "123" → ["12", "3"] — reusable across challenges
 type SplitTail<S extends string, Head extends string = ""> =
   S extends `${infer F}${infer R}`
     ? R extends ""
@@ -119,7 +237,6 @@ type SplitTail<S extends string, Head extends string = ""> =
       : SplitTail<R, `${Head}${F}`>
     : never
 
-// Subtract 1 with borrow propagation
 type SubtractOne<S extends string> =
   SplitTail<S> extends [infer H extends string, infer L extends string]
     ? L extends '0'
@@ -127,11 +244,9 @@ type SubtractOne<S extends string> =
       : L extends keyof PrevDigit ? `${H}${PrevDigit[L]}` : never
     : never
 
-// Trim leading zeros — keep standalone "0"
 type TrimZeros<S extends string> =
   S extends `0${infer R}` ? R extends "" ? "0" : TrimZeros<R> : S
 
-// Main type — MinusOne<0> guard included
 type MinusOne<T extends number> =
   T extends 0 ? never
     : `${T}` extends infer S extends string
@@ -140,13 +255,6 @@ type MinusOne<T extends number> =
         : never
       : never
 ```
-
-**Key improvements:**
-- ✅ `T extends 0` guard prevents negative overflow
-- ✅ `SplitTail` is generic — reusable in `Subtract<A,B>`, `Increment<N>` etc.
-- ✅ Every helper independently testable
-- ✅ Full JSDoc mental model — great for learners and code reviewers
-- ✅ TS 4.8 `infer X extends T` shorthand used throughout
 
 **[📌 View Live Comment on type-challenges →](https://github.com/type-challenges/type-challenges/issues/38224#issuecomment-4797379914)**
 
@@ -165,85 +273,9 @@ type MinusOne<T extends number> =
 ![Priority](https://img.shields.io/badge/Priority-Low-lightgrey?style=flat-square)
 ![Label](https://img.shields.io/badge/Label-good_first_issue-7057ff?style=flat-square)
 
-> 🔒 **Type safety fix** — two Recharts callback props typed as `any` removed and replaced with proper Recharts `ValueType`/`NameType` or minimal local interfaces scoped to fields actually used.
-
 **[📌 View Full Triage + Live Comment →](https://github.com/DogStark/petChain-Frontend/issues/575#issuecomment-4797528640)**
 
 </div>
-
----
-
-### 🔎 Root Cause Analysis — petChain-Frontend #575
-
-**Files affected:**
-- `src/components/analytics/FinancialReportChart.tsx` — `formatter={(value: any) => ...}` (line ~42)
-- `src/components/analytics/PetHealthChart.tsx` — `renderCustomizedLabel = (props: any)` (line ~13)
-
-| File | Issue | Impact |
-|------|-------|--------|
-| `FinancialReportChart.tsx` | `value: any` in tooltip formatter | No type safety on currency formatting — silent runtime errors possible |
-| `PetHealthChart.tsx` | `props: any` + `eslint-disable` | Suppresses linting, hides structural misuse of label render props |
-
-**The Fix — `FinancialReportChart.tsx`:**
-
-```tsx
-// Option A — Recharts exported types (TS 4.8+, recharts v2.x)
-import type { ValueType, NameType } from 'recharts/types/component/DefaultTooltipContent';
-
-formatter={(value: ValueType, _name: NameType) => [
-  `$${formatCurrency(value as number)}`,
-  undefined,
-]}
-
-// Option B — Safe inline fallback (no extra import)
-formatter={(value: number | string) => [
-  `$${formatCurrency(Number(value))}`,
-  undefined,
-]}
-```
-
-**The Fix — `PetHealthChart.tsx`:**
-
-```tsx
-// Minimal local interface — scoped to exactly the 6 fields used
-interface PieLabelRenderProps {
-  cx: number;
-  cy: number;
-  midAngle: number;
-  innerRadius: number;
-  outerRadius: number;
-  percent: number;
-}
-
-// eslint-disable comment fully removed — no longer needed
-const renderCustomizedLabel = ({
-  cx, cy, midAngle, innerRadius, outerRadius, percent
-}: PieLabelRenderProps) => {
-  const RADIAN = Math.PI / 180;
-  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-  const x = cx + radius * Math.cos(-midAngle * RADIAN);
-  const y = cy + radius * Math.sin(-midAngle * RADIAN);
-  return (
-    <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
-      {`${(percent * 100).toFixed(0)}%`}
-    </text>
-  );
-};
-```
-
-**Why local interface over full Recharts import:**
-
-| Approach | Stability | Readability | Version Safety |
-|----------|-----------|-------------|----------------|
-| `props: any` | ❌ None | ❌ | ✅ |
-| Import `PieLabelRenderPropsType` | ✅ Official | ⚠️ Verbose | ⚠️ Can break on bump |
-| **Local `PieLabelRenderProps`** ✅ | ✅ | ✅ Clean | ✅ Stable |
-
-**Acceptance Criteria:**
-- [x] No `any` in `FinancialReportChart.tsx` formatter
-- [x] No `any` in `PetHealthChart.tsx` `renderCustomizedLabel`
-- [x] `eslint-disable` comment removed
-- [x] Types scoped to fields actually used — no over-engineering
 
 ---
 
@@ -256,10 +288,6 @@ const renderCustomizedLabel = ({
 ![TypeScript](https://img.shields.io/badge/TypeScript-Fix-3178C6?style=flat-square&logo=typescript&logoColor=white)
 ![Status](https://img.shields.io/badge/Status-Triaged_&_Solved-01696f?style=flat-square)
 ![Effort](https://img.shields.io/badge/Effort-~1_Hour-yellow?style=flat-square)
-![Priority](https://img.shields.io/badge/Priority-Low-lightgrey?style=flat-square)
-![Label](https://img.shields.io/badge/Label-good_first_issue-7057ff?style=flat-square)
-
-> 🧹 **Production hygiene fix** — two console statements firing unconditionally in all environments, leaking internal debug messages to prod and inflating error monitoring noise.
 
 **[📌 View Full Triage + Live Comment →](https://github.com/DogStark/petChain-Frontend/issues/595#issuecomment-4797253120)**
 
@@ -267,48 +295,9 @@ const renderCustomizedLabel = ({
 
 ---
 
-### ✅ The Fix — `src/hooks/usePWA.ts`
-
-#### Fix 1 — Gate background sync success log (dev-only)
-
-```ts
-// ❌ BEFORE — fires in production
-navigator.serviceWorker.addEventListener('message', (event) => {
-  if (event.data?.type === 'BACKGROUND_SYNC_COMPLETE') {
-    console.log('[PWA] Background sync completed');
-  }
-});
-
-// ✅ AFTER — dev-only, zero prod leakage
-navigator.serviceWorker.addEventListener('message', (event) => {
-  if (event.data?.type === 'BACKGROUND_SYNC_COMPLETE') {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[PWA] Background sync completed');
-    }
-  }
-});
-```
-
-#### Fix 2 — Gate SW registration error log
-
-```ts
-// ❌ BEFORE
-.catch((err) => console.error('[PWA] SW registration failed:', err));
-
-// ✅ AFTER
-.catch((err) => {
-  if (process.env.NODE_ENV === 'development') {
-    console.error('[PWA] SW registration failed:', err);
-  }
-  // Production: Sentry.captureException(err)
-});
-```
-
----
-
 ## 💰 Bounty Issues — Active Attempt List
 
-> Tracking high-value open-source bounties aligned with my stack. Updated regularly. Issues range from **$75 to $20,000+**.
+> Tracking high-value open-source bounties aligned with my stack.
 
 ### 🎯 archestra-ai/archestra
 
@@ -320,8 +309,6 @@ navigator.serviceWorker.addEventListener('message', (event) => {
 | 4 | [#3858 — Agent template catalog](https://github.com/archestra-ai/archestra/issues/3858) | $450 | Medium | Full Stack / AI |
 | 5 | [#3218 — Jira + Confluence ACL sync](https://github.com/archestra-ai/archestra/issues/3218) | $150 | Medium | Node.js / API |
 | 6 | [#4758 — Improve UX limits visibility](https://github.com/archestra-ai/archestra/issues/4758) | $150 | Easy | React / Next.js |
-
----
 
 ### 🎯 BasedHardware/omi
 
@@ -336,48 +323,18 @@ navigator.serviceWorker.addEventListener('message', (event) => {
 
 ---
 
-### 🎯 PrimeIntellect-ai
-
-| # | Issue | Bounty | Difficulty | Skills |
-|---|-------|--------|------------|--------|
-| 13 | [ART-E mail agent](https://github.com/PrimeIntellect-ai) | $200–$800 | Easy–Hard | AI / Automation |
-| 14 | [SWE-Swiss RL pipeline](https://github.com/PrimeIntellect-ai) | $400–$800 | Medium–Hard | ML / Python |
-
----
-
-### 🎯 tscircuit
-
-| # | Issue | Bounty | Difficulty | Skills |
-|---|-------|--------|------------|--------|
-| 15 | [Fix schematic trace bugs](https://github.com/tscircuit/tscircuit/issues) | $75 each | Easy | TypeScript / EDA |
-
----
-
-### 🎯 CatchTheSignal — GitHub Opportunities Aggregator
-
-| # | Project | Bounty Range | Scope |
-|---|---------|-------------|-------|
-| 16 | [GitHub Opportunities Aggregator](https://github.com/CatchTheSignal) | $100–$10k+ | Tracks $100–$10k+ issues hourly, good first issues for portfolio, and sponsored projects for recurring income |
-
----
-
-### 📊 Bounty Summary
-
-| Repo | Issues | Total Potential |
-|------|--------|----------------|
-| archestra-ai/archestra | 6 | ~$5,300 |
-| BasedHardware/omi | 6 | ~$25,100 |
-| PrimeIntellect-ai | 2 | ~$600–$1,600 |
-| tscircuit | Multiple | $75+ each |
-| CatchTheSignal | Ongoing | $100–$10k+ |
-
-> 💡 **Strategy:** Start with Easy issues ($150–$300) to build contributor trust, then move to Medium/Hard for larger bounties.
-
----
-
 ## 📋 Issue Response Log
 
 > Sorted newest → oldest. Every entry links directly to the live comment.
+
+### ⚛️ [calcom/cal.diy](https://github.com/calcom/cal.diy)
+> Open-source scheduling infrastructure — used by thousands of teams & developers globally
+
+| # | Issue | Type | My Response | PR | Date |
+|---|-------|------|-------------|-----|------|
+| [#28979](https://github.com/calcom/cal.com/issues/28979) | `embed-react` config/theme prop silently ignored after mount — `useRef` guard kills reactive updates | ⚛️ React Hooks / Bug Fix | [Triage Comment →](https://github.com/calcom/cal.diy/issues/28979#issuecomment-4797753409) | [PR #29643 →](https://github.com/calcom/cal.diy/pull/29643) | Jun 25, 2026 |
+
+---
 
 ### 🧩 [type-challenges/type-challenges](https://github.com/type-challenges/type-challenges)
 > The world's largest TypeScript type-level programming challenge repository — 40k+ stars
@@ -411,68 +368,63 @@ navigator.serviceWorker.addEventListener('message', (event) => {
 
 ---
 
+## 📈 Contribution Stats
+
+| Metric | Count |
+|--------|-------|
+| Repos Contributed To | **4** |
+| Issues Triaged | **9** |
+| PRs Submitted | **2** (Velocity #25 ✅ merged · cal.diy #29643 🔥 open) |
+| TypeScript Issues | 4 |
+| React / Embed Issues | **1** |
+| Architecture / Discussion | 2 |
+| DevOps / Infrastructure | 1 |
+| Production Hygiene | 1 |
+| Active Since | Jun 23, 2026 |
+
+---
+
 ## 💡 Response Highlights
+
+### ⚛️ #28979 — embed-react config/theme prop ignored after mount (calcom/cal.diy)
+**Reframed as:** A React hooks lifecycle correctness issue — the `useRef` guard pattern is valid for preventing double-init but incorrectly applied as a general effect gate, silently invalidating the dep array's reactive purpose.
+**Contributions this session:**
+- 💬 Maintainer-level triage comment with 3-tier fix options, test case specs, and file-level change table
+- 🍴 Fork: `calcom/cal.diy` → `SNTL84/cal.diy`
+- 🌿 Branch: `fix/embed-react-config-prop-ignored-after-mount`
+- 🔧 Actual source fix committed to `packages/embeds/embed-react/src/Cal.tsx` — split into 2 `useEffect` hooks
+- 🚀 Draft PR #29643 opened to `calcom/cal.diy` with full root cause, fix rationale, comparison table, and test plan
+- 👤 Profile README updated with `@calcom/embed-react Specialist` badge and session record
+
+---
 
 ### 🧩 #38224 — MinusOne Enhanced Solution (type-challenges)
 **Reframed as:** A TypeScript type arithmetic problem requiring string-level decimal borrow propagation — not just a formatter but a reusable type utility system.
-**Contribution:** Enhanced the existing community answer with `T=0` guard, fully generic `SplitTail` helper reusable in `Subtract<A,B>` and `Increment<N>`, TS 4.8 `infer X extends T` shorthand, complete JSDoc mental model, and a comparison table vs existing answers. First commenter on a fresh hard-level issue with 6 reactions.
+**Contribution:** Enhanced community answer with `T=0` guard, generic `SplitTail` helper, TS 4.8 shorthand, complete JSDoc mental model, and comparison table vs existing answers.
 
 ---
 
 ### 🔒 #575 — Remove `any` from Chart Formatter Props (petChain-Frontend)
-**Reframed as:** Type safety debt in Recharts integration — `any` propagation in formatters silently allows runtime type mismatches on currency values and label render calculations.
-**Contribution:** Dual-option fix for `FinancialReportChart` (Recharts import path + safe fallback), minimal local interface strategy for `PetHealthChart` that is more stable than importing fragile Recharts internal types, removal of `eslint-disable` comment, comparison table of all 3 approaches, filled acceptance criteria checklist, and offered to extend the pattern to `UserEngagementChart` and `VaccinationChart`.
+**Reframed as:** Type safety debt in Recharts integration — `any` propagation silently allows runtime type mismatches on currency values and label render calculations.
+**Contribution:** Dual-option fix for `FinancialReportChart`, minimal local interface strategy for `PetHealthChart`, `eslint-disable` removal, approach comparison table.
 
 ---
 
 ### 🧹 #595 — Console Logging Cleanup in `usePWA.ts` (petChain-Frontend)
-**Reframed as:** Production hygiene issue — unconditional debug logs expose internal messaging, inflate error monitoring noise, and signal unreviewed code to auditors.
-**Contribution:** Full root cause triage with exact line numbers, dual-fix spec with before/after code blocks, alignment to existing `_app.tsx` gating pattern, and maintainer-aware review offer for the assigned contributor.
+**Reframed as:** Production hygiene issue — unconditional debug logs expose internal messaging and inflate error monitoring noise.
+**Contribution:** Full root cause triage with exact line numbers, dual-fix spec with before/after code blocks, alignment to existing `_app.tsx` gating pattern.
 
 ---
 
 ### 🏗️ #23 — Agentic IDE Architecture (Velocity)
 **Reframed as:** Runtime boundary problem, not a forking problem.
-**Contribution:** Full architectural diagram showing Editor View / Agentic View / Orchestration Layer separation, answered 3 key technical questions with practitioner-tested solutions.
+**Contribution:** Full architectural diagram showing Editor / Agentic / Orchestration Layer separation.
 
 ---
 
 ### 🐛 #17 — Missing Artifacts Directory Breaks Build (Velocity)
 **Reframed as:** Missing module regression with no guard in CI.
-**Contribution:** Traced ESM import chain, created full regression test suite (6 vitest tests), submitted **[PR #25](https://github.com/ishandutta2007/Velocity/pull/25)** to permanently lock the fix.
-
----
-
-### 🐳 #12 — Dockerfile Missing (Velocity)
-**Reframed as:** Platform portability and deployment infrastructure gap affecting contributor onboarding, CI/CD pipelines, and cloud-native scaling.
-**Contribution:** 5-step maintainer resolution path (stack audit → Dockerfile → docker-compose → README → CI wiring).
-
----
-
-### ⚡ #11 — API Support for Automation (Velocity)
-**Reframed as:** Missing automation integration layer blocking N8N, Zapier, and CI/CD-aware AI reviews.
-**Contribution:** Full REST API spec with 6 endpoints, GROUP CHAT monorepo session design, SSE streaming, and N8N workflow integration example.
-
----
-
-### 🎨 #10 — Colored Tab Groups with Pin Support (Velocity)
-**Reframed as:** Editor UX power feature with standalone extension path for the wider VSCode fork ecosystem.
-**Contribution:** Full implementation breakdown — data model, VS Code API hooks, UI reference suggestions, standalone VSIX extension path.
-
----
-
-## 📈 Contribution Stats
-
-| Metric | Count |
-|--------|-------|
-| Repos Contributed To | 3 |
-| Issues Triaged | 8 |
-| PRs Submitted | 1 |
-| TypeScript Issues | 4 |
-| Architecture / Discussion | 2 |
-| DevOps / Infrastructure | 1 |
-| Production Hygiene | 1 |
-| Active Since | Jun 23, 2026 |
+**Contribution:** Traced ESM import chain, created full regression test suite (6 vitest tests), submitted **[PR #25](https://github.com/ishandutta2007/Velocity/pull/25)** — merged ✅.
 
 ---
 
@@ -490,20 +442,11 @@ Languages         →  JavaScript · TypeScript · HTML/CSS · Python
 
 ## 💰 Open to Collaboration & Monetization
 
-> If you're a **maintainer** looking for a high-context contributor, or a **founder/operator** who wants to automate what's costing you time — let's talk.
-
 ```
 | SNTL 84 | Agentic AI Workflow Professional |
 Lead Generation · Fulfillment Automation · Bench Resource Availability
 Full-Stack Builds · AI Workflows · Supply Chain Business Intelligence
 ```
-
-**Services available:**
-- 🤖 AI Workflow Automation (N8N, Claude, browser automation)
-- 💻 Full-Stack Development (React, Next.js, Node.js, Supabase)
-- 📊 Supply Chain & Business Intelligence Dashboards
-- 🔍 Open Source Contribution & Code Review as a Service
-- 🎓 TypeScript Type System Consulting
 
 🚀 *Follow for practical AI automation insights & founder systems.*
 
@@ -521,16 +464,6 @@ Full-Stack Builds · AI Workflows · Supply Chain Business Intelligence
 | 💬 WhatsApp | [wa.me/919727413309](https://wa.me/919727413309) |
 | 📧 Email | [3goldenlotusroots@gmail.com](mailto:3goldenlotusroots@gmail.com) |
 | 🤖 Aratt.ai | [@desidevloper](https://aratt.ai/user/@desidevloper) |
-
----
-
-## 📌 How to Use This Repo
-
-If you find an issue in an open-source project you'd like triaged:
-
-1. **Open a Discussion** in this repo with the issue link
-2. I'll review, respond with a maintainer-level analysis
-3. Response gets logged in the table above for public record
 
 ---
 
