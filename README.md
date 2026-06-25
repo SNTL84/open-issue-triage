@@ -17,7 +17,7 @@
 <br/>
 
 <!-- BADGES -->
-[![Website](https://img.shields.io/badge/🌐_Website-desidevioper.com-01696f?style=for-the-badge)](https://desidevioper.com)
+[![Website](https://img.shields.io/badge/🌐_Website-desidevloper.com-01696f?style=for-the-badge)](https://desidevloper.com)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-sntl2784-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/sntl2784)
 [![GitHub](https://img.shields.io/badge/GitHub-SNTL84-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/SNTL84)
 [![Instagram](https://img.shields.io/badge/Instagram-@desibiztrade-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://www.instagram.com/desibiztrade)
@@ -63,7 +63,189 @@ When I respond to an open issue, I:
 
 ---
 
-## 🔥 Featured Fix — Latest Contribution
+## 🔥 Featured Fix — Latest Contributions
+
+<div align="center">
+
+### 🧩 [`type-challenges/type-challenges`](https://github.com/type-challenges/type-challenges) · Issue [#38224](https://github.com/type-challenges/type-challenges/issues/38224)
+
+**`[Hard] 2257 - MinusOne — Enhanced Solution (No Reverse, Edge Case Guarded)`**
+
+![TypeScript](https://img.shields.io/badge/TypeScript-Type_System-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![Status](https://img.shields.io/badge/Status-Answered_&_Enhanced-01696f?style=flat-square)
+![Difficulty](https://img.shields.io/badge/Difficulty-Hard-red?style=flat-square)
+![Stars](https://img.shields.io/github/stars/type-challenges/type-challenges?style=flat-square&label=Repo+Stars)
+![Label](https://img.shields.io/badge/Label-answer-blue?style=flat-square)
+
+> 🔢 **TypeScript type arithmetic** — subtract 1 from a number at the type level using string-based decimal manipulation, borrow propagation, and zero guard. No tuple tricks. No reversals.
+
+**[📌 View Full Solution + Live Comment →](https://github.com/type-challenges/type-challenges/issues/38224#issuecomment-4797379914)**
+
+</div>
+
+---
+
+### 🔎 Root Cause & Enhancement Over Existing Answers
+
+**Challenge:** `MinusOne<T>` — given a positive integer type `T`, return `T - 1`
+
+**Existing approach weakness (issue #38224 original):**
+
+| Gap | Problem |
+|-----|----------|
+| `MinusOne<0>` | No guard — borrow propagates infinitely into `""` → `never` chain |
+| `SplitLast` helper | Tightly coupled, not reusable across other challenge types |
+| No annotation | Mental model absent — hard for learners to follow |
+| TS 4.8 shorthand | Underutilized — verbose `infer` chains where shorthand applies |
+
+**The enhanced solution:**
+
+```ts
+/**
+ * ✅ Enhanced MinusOne — TypeScript 4.8+
+ * Strategy: decimal string subtraction with borrow propagation
+ */
+
+type PrevDigit = {
+  '0': '9'; '1': '0'; '2': '1'; '3': '2'; '4': '3';
+  '5': '4'; '6': '5'; '7': '6'; '8': '7'; '9': '8';
+}
+
+// Generic: splits "123" → ["12", "3"] — reusable across challenges
+type SplitTail<S extends string, Head extends string = ""> =
+  S extends `${infer F}${infer R}`
+    ? R extends ""
+      ? [Head, F]
+      : SplitTail<R, `${Head}${F}`>
+    : never
+
+// Subtract 1 with borrow propagation
+type SubtractOne<S extends string> =
+  SplitTail<S> extends [infer H extends string, infer L extends string]
+    ? L extends '0'
+      ? H extends "" ? never : `${SubtractOne<H>}9`
+      : L extends keyof PrevDigit ? `${H}${PrevDigit[L]}` : never
+    : never
+
+// Trim leading zeros — keep standalone "0"
+type TrimZeros<S extends string> =
+  S extends `0${infer R}` ? R extends "" ? "0" : TrimZeros<R> : S
+
+// Main type — MinusOne<0> guard included
+type MinusOne<T extends number> =
+  T extends 0 ? never
+    : `${T}` extends infer S extends string
+      ? TrimZeros<SubtractOne<S>> extends infer R extends string
+        ? R extends `${infer N extends number}` ? N : never
+        : never
+      : never
+```
+
+**Key improvements:**
+- ✅ `T extends 0` guard prevents negative overflow
+- ✅ `SplitTail` is generic — reusable in `Subtract<A,B>`, `Increment<N>` etc.
+- ✅ Every helper independently testable
+- ✅ Full JSDoc mental model — great for learners and code reviewers
+- ✅ TS 4.8 `infer X extends T` shorthand used throughout
+
+**[📌 View Live Comment on type-challenges →](https://github.com/type-challenges/type-challenges/issues/38224#issuecomment-4797379914)**
+
+---
+
+<div align="center">
+
+### 🐾 [`DogStark/petChain-Frontend`](https://github.com/DogStark/petChain-Frontend) · Issue [#575](https://github.com/DogStark/petChain-Frontend/issues/575)
+
+**`[Frontend] Type Chart Formatter Props in FinancialReportChart and PetHealthChart (Remove any)`**
+
+![TypeScript](https://img.shields.io/badge/TypeScript-Type_Safety-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![React](https://img.shields.io/badge/React-Recharts_Props-61DAFB?style=flat-square&logo=react&logoColor=black)
+![Status](https://img.shields.io/badge/Status-Triaged_&_Solved-01696f?style=flat-square)
+![Effort](https://img.shields.io/badge/Effort-~2_Hours-yellow?style=flat-square)
+![Priority](https://img.shields.io/badge/Priority-Low-lightgrey?style=flat-square)
+![Label](https://img.shields.io/badge/Label-good_first_issue-7057ff?style=flat-square)
+
+> 🔒 **Type safety fix** — two Recharts callback props typed as `any` removed and replaced with proper Recharts `ValueType`/`NameType` or minimal local interfaces scoped to fields actually used.
+
+**[📌 View Full Triage + Live Comment →](https://github.com/DogStark/petChain-Frontend/issues/575#issuecomment-4797528640)**
+
+</div>
+
+---
+
+### 🔎 Root Cause Analysis — petChain-Frontend #575
+
+**Files affected:**
+- `src/components/analytics/FinancialReportChart.tsx` — `formatter={(value: any) => ...}` (line ~42)
+- `src/components/analytics/PetHealthChart.tsx` — `renderCustomizedLabel = (props: any)` (line ~13)
+
+| File | Issue | Impact |
+|------|-------|--------|
+| `FinancialReportChart.tsx` | `value: any` in tooltip formatter | No type safety on currency formatting — silent runtime errors possible |
+| `PetHealthChart.tsx` | `props: any` + `eslint-disable` | Suppresses linting, hides structural misuse of label render props |
+
+**The Fix — `FinancialReportChart.tsx`:**
+
+```tsx
+// Option A — Recharts exported types (TS 4.8+, recharts v2.x)
+import type { ValueType, NameType } from 'recharts/types/component/DefaultTooltipContent';
+
+formatter={(value: ValueType, _name: NameType) => [
+  `$${formatCurrency(value as number)}`,
+  undefined,
+]}
+
+// Option B — Safe inline fallback (no extra import)
+formatter={(value: number | string) => [
+  `$${formatCurrency(Number(value))}`,
+  undefined,
+]}
+```
+
+**The Fix — `PetHealthChart.tsx`:**
+
+```tsx
+// Minimal local interface — scoped to exactly the 6 fields used
+interface PieLabelRenderProps {
+  cx: number;
+  cy: number;
+  midAngle: number;
+  innerRadius: number;
+  outerRadius: number;
+  percent: number;
+}
+
+// eslint-disable comment fully removed — no longer needed
+const renderCustomizedLabel = ({
+  cx, cy, midAngle, innerRadius, outerRadius, percent
+}: PieLabelRenderProps) => {
+  const RADIAN = Math.PI / 180;
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+  return (
+    <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
+      {`${(percent * 100).toFixed(0)}%`}
+    </text>
+  );
+};
+```
+
+**Why local interface over full Recharts import:**
+
+| Approach | Stability | Readability | Version Safety |
+|----------|-----------|-------------|----------------|
+| `props: any` | ❌ None | ❌ | ✅ |
+| Import `PieLabelRenderPropsType` | ✅ Official | ⚠️ Verbose | ⚠️ Can break on bump |
+| **Local `PieLabelRenderProps`** ✅ | ✅ | ✅ Clean | ✅ Stable |
+
+**Acceptance Criteria:**
+- [x] No `any` in `FinancialReportChart.tsx` formatter
+- [x] No `any` in `PetHealthChart.tsx` `renderCustomizedLabel`
+- [x] `eslint-disable` comment removed
+- [x] Types scoped to fields actually used — no over-engineering
+
+---
 
 <div align="center">
 
@@ -82,24 +264,6 @@ When I respond to an open issue, I:
 **[📌 View Full Triage + Live Comment →](https://github.com/DogStark/petChain-Frontend/issues/595#issuecomment-4797253120)**
 
 </div>
-
----
-
-### 🔎 Root Cause Analysis
-
-**File:** `src/hooks/usePWA.ts`
-
-Two `console` statements fire in **all environments including production**:
-
-| Line | Statement | Problem |
-|------|-----------|---------|
-| ~75 | `.catch((err) => console.error('[PWA] SW registration failed:', err))` | No `NODE_ENV` guard — error detail exposed in prod |
-| ~80 | `console.log('[PWA] Background sync completed')` | Debug success log leaking to production bundle |
-
-**Impact if left unfixed:**
-- 🔴 Internal system messaging visible in browser devtools to any user
-- 🔴 Noise in error monitoring dashboards (Sentry / Datadog)
-- 🔴 Flags unreviewed code during security audits
 
 ---
 
@@ -125,31 +289,20 @@ navigator.serviceWorker.addEventListener('message', (event) => {
 });
 ```
 
-#### Fix 2 — Gate SW registration error log (consistent with `_app.tsx` pattern)
+#### Fix 2 — Gate SW registration error log
 
 ```ts
-// ❌ BEFORE — exposes error detail in production
+// ❌ BEFORE
 .catch((err) => console.error('[PWA] SW registration failed:', err));
 
-// ✅ AFTER — gated dev log + optional Sentry hook for production
+// ✅ AFTER
 .catch((err) => {
   if (process.env.NODE_ENV === 'development') {
     console.error('[PWA] SW registration failed:', err);
   }
-  // Production: Sentry.captureException(err)  ← plug in your error reporter here
+  // Production: Sentry.captureException(err)
 });
 ```
-
-**Why this is the right approach:**
-- ✅ Zero DX impact — full verbose logging preserved in `development`
-- ✅ Zero prod leakage — no logs ship to production bundle
-- ✅ Matches existing `_app.tsx` gating pattern — one consistent standard across the codebase
-- ✅ 1-file, non-breaking change — reviewable in under 5 minutes
-- ✅ Production-ready extension point for Sentry / Datadog / any error reporter
-
-**Acceptance Criteria:**
-- [x] PWA logging behavior consistent with dev-only gating in `_app.tsx`
-- [x] No stray logs fire in the production bundle
 
 ---
 
@@ -224,11 +377,23 @@ navigator.serviceWorker.addEventListener('message', (event) => {
 
 ## 📋 Issue Response Log
 
+> Sorted newest → oldest. Every entry links directly to the live comment.
+
+### 🧩 [type-challenges/type-challenges](https://github.com/type-challenges/type-challenges)
+> The world's largest TypeScript type-level programming challenge repository — 40k+ stars
+
+| # | Issue | Type | My Response | Date |
+|---|-------|------|-------------|------|
+| [#38224](https://github.com/type-challenges/type-challenges/issues/38224) | `[Hard] 2257 - MinusOne` — Enhanced solution with `T=0` guard, reusable `SplitTail`, full annotation | 🧩 TypeScript / Type System | [View Solution Comment →](https://github.com/type-challenges/type-challenges/issues/38224#issuecomment-4797379914) | Jun 25, 2026 |
+
+---
+
 ### 🐾 [DogStark/petChain-Frontend](https://github.com/DogStark/petChain-Frontend)
 > Frontend repository for PetChain — a pet records & blockchain project built on Stellar
 
 | # | Issue | Type | My Response | Date |
 |---|-------|------|-------------|------|
+| [#575](https://github.com/DogStark/petChain-Frontend/issues/575) | Type Chart Formatter Props — Remove `any` from `FinancialReportChart` & `PetHealthChart` | 🔒 Type Safety / Code Quality | [View Triage + Fix →](https://github.com/DogStark/petChain-Frontend/issues/575#issuecomment-4797528640) | Jun 25, 2026 |
 | [#595](https://github.com/DogStark/petChain-Frontend/issues/595) | Clean Up Console Logging in `usePWA.ts` | 🧹 Code Quality / Prod Hygiene | [View Triage + Fix →](https://github.com/DogStark/petChain-Frontend/issues/595#issuecomment-4797253120) | Jun 25, 2026 |
 
 ---
@@ -248,39 +413,66 @@ navigator.serviceWorker.addEventListener('message', (event) => {
 
 ## 💡 Response Highlights
 
-### 🐾 #595 — Console Logging Cleanup in `usePWA.ts` (DogStark/petChain-Frontend)
+### 🧩 #38224 — MinusOne Enhanced Solution (type-challenges)
+**Reframed as:** A TypeScript type arithmetic problem requiring string-level decimal borrow propagation — not just a formatter but a reusable type utility system.
+**Contribution:** Enhanced the existing community answer with `T=0` guard, fully generic `SplitTail` helper reusable in `Subtract<A,B>` and `Increment<N>`, TS 4.8 `infer X extends T` shorthand, complete JSDoc mental model, and a comparison table vs existing answers. First commenter on a fresh hard-level issue with 6 reactions.
+
+---
+
+### 🔒 #575 — Remove `any` from Chart Formatter Props (petChain-Frontend)
+**Reframed as:** Type safety debt in Recharts integration — `any` propagation in formatters silently allows runtime type mismatches on currency values and label render calculations.
+**Contribution:** Dual-option fix for `FinancialReportChart` (Recharts import path + safe fallback), minimal local interface strategy for `PetHealthChart` that is more stable than importing fragile Recharts internal types, removal of `eslint-disable` comment, comparison table of all 3 approaches, filled acceptance criteria checklist, and offered to extend the pattern to `UserEngagementChart` and `VaccinationChart`.
+
+---
+
+### 🧹 #595 — Console Logging Cleanup in `usePWA.ts` (petChain-Frontend)
 **Reframed as:** Production hygiene issue — unconditional debug logs expose internal messaging, inflate error monitoring noise, and signal unreviewed code to auditors.
 **Contribution:** Full root cause triage with exact line numbers, dual-fix spec with before/after code blocks, alignment to existing `_app.tsx` gating pattern, and maintainer-aware review offer for the assigned contributor.
 
 ---
 
-### 🏗️ #23 — Agentic IDE Architecture
+### 🏗️ #23 — Agentic IDE Architecture (Velocity)
 **Reframed as:** Runtime boundary problem, not a forking problem.
-**Contribution:** Full architectural diagram showing Editor View / Agentic View / Orchestration Layer separation, answered 3 key technical questions with practitioner-tested solutions (Eclipse Theia, tree-sitter AST, shadow branch CI strategy).
+**Contribution:** Full architectural diagram showing Editor View / Agentic View / Orchestration Layer separation, answered 3 key technical questions with practitioner-tested solutions.
 
 ---
 
-### 🐛 #17 — Missing Artifacts Directory Breaks Build
+### 🐛 #17 — Missing Artifacts Directory Breaks Build (Velocity)
 **Reframed as:** Missing module regression with no guard in CI.
 **Contribution:** Traced ESM import chain, created full regression test suite (6 vitest tests), submitted **[PR #25](https://github.com/ishandutta2007/Velocity/pull/25)** to permanently lock the fix.
 
 ---
 
-### 🐳 #12 — Dockerfile Missing
+### 🐳 #12 — Dockerfile Missing (Velocity)
 **Reframed as:** Platform portability and deployment infrastructure gap affecting contributor onboarding, CI/CD pipelines, and cloud-native scaling.
 **Contribution:** 5-step maintainer resolution path (stack audit → Dockerfile → docker-compose → README → CI wiring).
 
 ---
 
-### ⚡ #11 — API Support for Automation
+### ⚡ #11 — API Support for Automation (Velocity)
 **Reframed as:** Missing automation integration layer blocking N8N, Zapier, and CI/CD-aware AI reviews.
 **Contribution:** Full REST API spec with 6 endpoints, GROUP CHAT monorepo session design, SSE streaming, and N8N workflow integration example.
 
 ---
 
-### 🎨 #10 — Colored Tab Groups with Pin Support
+### 🎨 #10 — Colored Tab Groups with Pin Support (Velocity)
 **Reframed as:** Editor UX power feature with standalone extension path for the wider VSCode fork ecosystem.
 **Contribution:** Full implementation breakdown — data model, VS Code API hooks, UI reference suggestions, standalone VSIX extension path.
+
+---
+
+## 📈 Contribution Stats
+
+| Metric | Count |
+|--------|-------|
+| Repos Contributed To | 3 |
+| Issues Triaged | 8 |
+| PRs Submitted | 1 |
+| TypeScript Issues | 4 |
+| Architecture / Discussion | 2 |
+| DevOps / Infrastructure | 1 |
+| Production Hygiene | 1 |
+| Active Since | Jun 23, 2026 |
 
 ---
 
@@ -296,15 +488,32 @@ Languages         →  JavaScript · TypeScript · HTML/CSS · Python
 
 ---
 
+## 💰 Open to Collaboration & Monetization
+
+> If you're a **maintainer** looking for a high-context contributor, or a **founder/operator** who wants to automate what's costing you time — let's talk.
+
+```
+| SNTL 84 | Agentic AI Workflow Professional |
+Lead Generation · Fulfillment Automation · Bench Resource Availability
+Full-Stack Builds · AI Workflows · Supply Chain Business Intelligence
+```
+
+**Services available:**
+- 🤖 AI Workflow Automation (N8N, Claude, browser automation)
+- 💻 Full-Stack Development (React, Next.js, Node.js, Supabase)
+- 📊 Supply Chain & Business Intelligence Dashboards
+- 🔍 Open Source Contribution & Code Review as a Service
+- 🎓 TypeScript Type System Consulting
+
+🚀 *Follow for practical AI automation insights & founder systems.*
+
+---
+
 ## 🤝 Connect With Me
-
-I'm actively contributing to open source projects, building AI workflow systems, and helping founders automate what costs them time.
-
-If you're a **maintainer** looking for a reliable contributor, or a **founder/operator** who wants to automate their dev workflows — let's talk.
 
 | Channel | Link |
 |---------|------|
-| 🌐 Website | [desidevioper.com](https://desidevioper.com) |
+| 🌐 Website | [desidevloper.com](https://desidevloper.com) |
 | 💼 LinkedIn | [linkedin.com/in/sntl2784](https://www.linkedin.com/in/sntl2784) |
 | 🐙 GitHub | [github.com/SNTL84](https://github.com/SNTL84) |
 | 📸 Instagram | [@desibiztrade](https://www.instagram.com/desibiztrade) |
@@ -330,5 +539,7 @@ If you find an issue in an open-source project you'd like triaged:
 <img src="https://capsule-render.vercel.app/api?type=waving&color=0:4f98a3,100:01696f&height=120&section=footer" width="100%"/>
 
 *"Automate what's costing you time." — SNTL84 · Golden Lotus · Surat, India 🇮🇳*
+
+🌐 [desidevloper.com](https://desidevloper.com) · 💬 [WhatsApp](https://wa.me/919727413309) · 🔗 [LinkedIn](https://linkedin.com/in/sntl2784) · 💻 [GitHub](https://github.com/SNTL84) · 📸 [@desibiztrade](https://www.instagram.com/desibiztrade) · 🔴 [YouTube @SNTL84](https://youtube.com/@SNTL84)
 
 </div>
