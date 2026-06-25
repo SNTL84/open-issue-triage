@@ -128,6 +128,78 @@ When I respond to an open issue, I:
 
 ## 📋 Issue Response Log
 
+### 🐾 [DogStark/petChain-Frontend](https://github.com/DogStark/petChain-Frontend)
+> Frontend repository for PetChain — a pet records & blockchain project built on Stellar
+
+| # | Issue | Type | My Response | Date |
+|---|-------|------|-------------|------|
+| [#595](https://github.com/DogStark/petChain-Frontend/issues/595) | Clean Up Console Logging in `usePWA.ts` | 🧹 Code Quality / Prod Hygiene | [View Triage + Fix →](https://github.com/DogStark/petChain-Frontend/issues/595#issuecomment-4797253120) | Jun 25, 2026 |
+
+---
+
+### 🔎 Triage: #595 — Console Logging in `usePWA.ts`
+
+**Root Cause:**
+Two `console` statements in `src/hooks/usePWA.ts` fire unconditionally in all environments including production:
+- Line ~75: `.catch((err) => console.error('[PWA] SW registration failed:', err))` — no env guard
+- Line ~80: `console.log('[PWA] Background sync completed')` — debug/success log leaking to prod
+
+**Impact:** Verbose logs in production expose internal system messaging, add noise to error monitoring tools (Sentry/Datadog), and flag unreviewed code to security auditors.
+
+**Labels:** `good first issue` · `Stellar Wave` · `frontend`
+**Effort:** ~1 hour | **Priority:** Low
+
+---
+
+### ✅ Proposed Solution
+
+**File:** `src/hooks/usePWA.ts`
+
+**Fix 1 — Gate background sync success log (dev-only):**
+```ts
+// ❌ Before
+navigator.serviceWorker.addEventListener('message', (event) => {
+  if (event.data?.type === 'BACKGROUND_SYNC_COMPLETE') {
+    console.log('[PWA] Background sync completed');
+  }
+});
+
+// ✅ After
+navigator.serviceWorker.addEventListener('message', (event) => {
+  if (event.data?.type === 'BACKGROUND_SYNC_COMPLETE') {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[PWA] Background sync completed');
+    }
+  }
+});
+```
+
+**Fix 2 — Gate SW registration error log consistently with `_app.tsx` pattern:**
+```ts
+// ❌ Before
+.catch((err) => console.error('[PWA] SW registration failed:', err));
+
+// ✅ After
+.catch((err) => {
+  if (process.env.NODE_ENV === 'development') {
+    console.error('[PWA] SW registration failed:', err);
+  }
+  // Production: optionally route to error reporting (e.g. Sentry.captureException(err))
+});
+```
+
+**Why this approach:**
+- Keeps full logging in `development` — no DX impact
+- Zero logs leak to `production` bundle
+- Aligns with `_app.tsx` gating pattern per acceptance criteria
+- 1-file, non-breaking change — easily reviewable
+
+**Acceptance Criteria:**
+- [x] PWA logging behavior consistent with dev-only gating in `_app.tsx`
+- [x] No stray logs fire in the production bundle
+
+---
+
 ### 🚀 [ishandutta2007/Velocity](https://github.com/ishandutta2007/Velocity)
 > Agentic IDE built on VS Code — AI-native workspace for developers
 
@@ -142,6 +214,12 @@ When I respond to an open issue, I:
 ---
 
 ## 💡 Response Highlights
+
+### 🐾 #595 — Console Logging Cleanup in `usePWA.ts` (DogStark/petChain-Frontend)
+**Reframed as:** Production hygiene issue — unconditional debug logs expose internal messaging, inflate error monitoring noise, and signal unreviewed code to auditors.
+**Contribution:** Full root cause triage with exact line numbers, dual-fix spec with before/after code blocks, alignment to existing `_app.tsx` gating pattern, and maintainer-aware review offer for the assigned contributor.
+
+---
 
 ### 🏗️ #23 — Agentic IDE Architecture
 **Reframed as:** Runtime boundary problem, not a forking problem.  
