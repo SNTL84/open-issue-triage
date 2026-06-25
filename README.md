@@ -21,9 +21,15 @@
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-sntl2784-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/sntl2784)
 [![GitHub](https://img.shields.io/badge/GitHub-SNTL84-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/SNTL84)
 [![Instagram](https://img.shields.io/badge/Instagram-@desibiztrade-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://www.instagram.com/desibiztrade)
+[![YouTube](https://img.shields.io/badge/YouTube-@SNTL84-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtube.com/@SNTL84)
 [![WhatsApp](https://img.shields.io/badge/WhatsApp-Chat_Now-25D366?style=for-the-badge&logo=whatsapp&logoColor=white)](https://wa.me/919727413309)
 [![Email](https://img.shields.io/badge/Email-3goldenlotusroots-EA4335?style=for-the-badge&logo=gmail&logoColor=white)](mailto:3goldenlotusroots@gmail.com)
 [![Aratt.ai](https://img.shields.io/badge/Aratt.ai-@desidevloper-ff6b35?style=for-the-badge)](https://aratt.ai/user/@desidevloper)
+
+<br/>
+
+> 🚀 **Automate What's Costing You Time** · SNTL 84 · Agentic AI Workflow Professional
+> Lead Generation · Fulfillment Automation · Full-Stack Builds · AI Workflows · Supply Chain BI
 
 <br/><br/>
 
@@ -54,6 +60,96 @@ When I respond to an open issue, I:
 | **⚙️ Spec** | Provide a concrete implementation path, API design, or fix strategy |
 | **🔗 Link** | Reference PRs, related issues, or prior art where relevant |
 | **✅ Sign Off** | Close with handles so maintainers can follow up directly |
+
+---
+
+## 🔥 Featured Fix — Latest Contribution
+
+<div align="center">
+
+### 🐾 [`DogStark/petChain-Frontend`](https://github.com/DogStark/petChain-Frontend) · Issue [#595](https://github.com/DogStark/petChain-Frontend/issues/595)
+
+**`[Frontend] Clean Up Console Logging in usePWA.ts`**
+
+![TypeScript](https://img.shields.io/badge/TypeScript-Fix-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![Status](https://img.shields.io/badge/Status-Triaged_&_Solved-01696f?style=flat-square)
+![Effort](https://img.shields.io/badge/Effort-~1_Hour-yellow?style=flat-square)
+![Priority](https://img.shields.io/badge/Priority-Low-lightgrey?style=flat-square)
+![Label](https://img.shields.io/badge/Label-good_first_issue-7057ff?style=flat-square)
+
+> 🧹 **Production hygiene fix** — two console statements firing unconditionally in all environments, leaking internal debug messages to prod and inflating error monitoring noise.
+
+**[📌 View Full Triage + Live Comment →](https://github.com/DogStark/petChain-Frontend/issues/595#issuecomment-4797253120)**
+
+</div>
+
+---
+
+### 🔎 Root Cause Analysis
+
+**File:** `src/hooks/usePWA.ts`
+
+Two `console` statements fire in **all environments including production**:
+
+| Line | Statement | Problem |
+|------|-----------|---------|
+| ~75 | `.catch((err) => console.error('[PWA] SW registration failed:', err))` | No `NODE_ENV` guard — error detail exposed in prod |
+| ~80 | `console.log('[PWA] Background sync completed')` | Debug success log leaking to production bundle |
+
+**Impact if left unfixed:**
+- 🔴 Internal system messaging visible in browser devtools to any user
+- 🔴 Noise in error monitoring dashboards (Sentry / Datadog)
+- 🔴 Flags unreviewed code during security audits
+
+---
+
+### ✅ The Fix — `src/hooks/usePWA.ts`
+
+#### Fix 1 — Gate background sync success log (dev-only)
+
+```ts
+// ❌ BEFORE — fires in production
+navigator.serviceWorker.addEventListener('message', (event) => {
+  if (event.data?.type === 'BACKGROUND_SYNC_COMPLETE') {
+    console.log('[PWA] Background sync completed');
+  }
+});
+
+// ✅ AFTER — dev-only, zero prod leakage
+navigator.serviceWorker.addEventListener('message', (event) => {
+  if (event.data?.type === 'BACKGROUND_SYNC_COMPLETE') {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[PWA] Background sync completed');
+    }
+  }
+});
+```
+
+#### Fix 2 — Gate SW registration error log (consistent with `_app.tsx` pattern)
+
+```ts
+// ❌ BEFORE — exposes error detail in production
+.catch((err) => console.error('[PWA] SW registration failed:', err));
+
+// ✅ AFTER — gated dev log + optional Sentry hook for production
+.catch((err) => {
+  if (process.env.NODE_ENV === 'development') {
+    console.error('[PWA] SW registration failed:', err);
+  }
+  // Production: Sentry.captureException(err)  ← plug in your error reporter here
+});
+```
+
+**Why this is the right approach:**
+- ✅ Zero DX impact — full verbose logging preserved in `development`
+- ✅ Zero prod leakage — no logs ship to production bundle
+- ✅ Matches existing `_app.tsx` gating pattern — one consistent standard across the codebase
+- ✅ 1-file, non-breaking change — reviewable in under 5 minutes
+- ✅ Production-ready extension point for Sentry / Datadog / any error reporter
+
+**Acceptance Criteria:**
+- [x] PWA logging behavior consistent with dev-only gating in `_app.tsx`
+- [x] No stray logs fire in the production bundle
 
 ---
 
@@ -137,69 +233,6 @@ When I respond to an open issue, I:
 
 ---
 
-### 🔎 Triage: #595 — Console Logging in `usePWA.ts`
-
-**Root Cause:**
-Two `console` statements in `src/hooks/usePWA.ts` fire unconditionally in all environments including production:
-- Line ~75: `.catch((err) => console.error('[PWA] SW registration failed:', err))` — no env guard
-- Line ~80: `console.log('[PWA] Background sync completed')` — debug/success log leaking to prod
-
-**Impact:** Verbose logs in production expose internal system messaging, add noise to error monitoring tools (Sentry/Datadog), and flag unreviewed code to security auditors.
-
-**Labels:** `good first issue` · `Stellar Wave` · `frontend`
-**Effort:** ~1 hour | **Priority:** Low
-
----
-
-### ✅ Proposed Solution
-
-**File:** `src/hooks/usePWA.ts`
-
-**Fix 1 — Gate background sync success log (dev-only):**
-```ts
-// ❌ Before
-navigator.serviceWorker.addEventListener('message', (event) => {
-  if (event.data?.type === 'BACKGROUND_SYNC_COMPLETE') {
-    console.log('[PWA] Background sync completed');
-  }
-});
-
-// ✅ After
-navigator.serviceWorker.addEventListener('message', (event) => {
-  if (event.data?.type === 'BACKGROUND_SYNC_COMPLETE') {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[PWA] Background sync completed');
-    }
-  }
-});
-```
-
-**Fix 2 — Gate SW registration error log consistently with `_app.tsx` pattern:**
-```ts
-// ❌ Before
-.catch((err) => console.error('[PWA] SW registration failed:', err));
-
-// ✅ After
-.catch((err) => {
-  if (process.env.NODE_ENV === 'development') {
-    console.error('[PWA] SW registration failed:', err);
-  }
-  // Production: optionally route to error reporting (e.g. Sentry.captureException(err))
-});
-```
-
-**Why this approach:**
-- Keeps full logging in `development` — no DX impact
-- Zero logs leak to `production` bundle
-- Aligns with `_app.tsx` gating pattern per acceptance criteria
-- 1-file, non-breaking change — easily reviewable
-
-**Acceptance Criteria:**
-- [x] PWA logging behavior consistent with dev-only gating in `_app.tsx`
-- [x] No stray logs fire in the production bundle
-
----
-
 ### 🚀 [ishandutta2007/Velocity](https://github.com/ishandutta2007/Velocity)
 > Agentic IDE built on VS Code — AI-native workspace for developers
 
@@ -222,31 +255,31 @@ navigator.serviceWorker.addEventListener('message', (event) => {
 ---
 
 ### 🏗️ #23 — Agentic IDE Architecture
-**Reframed as:** Runtime boundary problem, not a forking problem.  
+**Reframed as:** Runtime boundary problem, not a forking problem.
 **Contribution:** Full architectural diagram showing Editor View / Agentic View / Orchestration Layer separation, answered 3 key technical questions with practitioner-tested solutions (Eclipse Theia, tree-sitter AST, shadow branch CI strategy).
 
 ---
 
-### 🐛 #17 — Missing Artifacts Directory Breaks Build  
-**Reframed as:** Missing module regression with no guard in CI.  
+### 🐛 #17 — Missing Artifacts Directory Breaks Build
+**Reframed as:** Missing module regression with no guard in CI.
 **Contribution:** Traced ESM import chain, created full regression test suite (6 vitest tests), submitted **[PR #25](https://github.com/ishandutta2007/Velocity/pull/25)** to permanently lock the fix.
 
 ---
 
-### 🐳 #12 — Dockerfile Missing  
-**Reframed as:** Platform portability and deployment infrastructure gap affecting contributor onboarding, CI/CD pipelines, and cloud-native scaling.  
+### 🐳 #12 — Dockerfile Missing
+**Reframed as:** Platform portability and deployment infrastructure gap affecting contributor onboarding, CI/CD pipelines, and cloud-native scaling.
 **Contribution:** 5-step maintainer resolution path (stack audit → Dockerfile → docker-compose → README → CI wiring).
 
 ---
 
-### ⚡ #11 — API Support for Automation  
-**Reframed as:** Missing automation integration layer blocking N8N, Zapier, and CI/CD-aware AI reviews.  
+### ⚡ #11 — API Support for Automation
+**Reframed as:** Missing automation integration layer blocking N8N, Zapier, and CI/CD-aware AI reviews.
 **Contribution:** Full REST API spec with 6 endpoints, GROUP CHAT monorepo session design, SSE streaming, and N8N workflow integration example.
 
 ---
 
-### 🎨 #10 — Colored Tab Groups with Pin Support  
-**Reframed as:** Editor UX power feature with standalone extension path for the wider VSCode fork ecosystem.  
+### 🎨 #10 — Colored Tab Groups with Pin Support
+**Reframed as:** Editor UX power feature with standalone extension path for the wider VSCode fork ecosystem.
 **Contribution:** Full implementation breakdown — data model, VS Code API hooks, UI reference suggestions, standalone VSIX extension path.
 
 ---
@@ -275,9 +308,9 @@ If you're a **maintainer** looking for a reliable contributor, or a **founder/op
 | 💼 LinkedIn | [linkedin.com/in/sntl2784](https://www.linkedin.com/in/sntl2784) |
 | 🐙 GitHub | [github.com/SNTL84](https://github.com/SNTL84) |
 | 📸 Instagram | [@desibiztrade](https://www.instagram.com/desibiztrade) |
+| 🔴 YouTube | [@SNTL84](https://youtube.com/@SNTL84) |
 | 💬 WhatsApp | [wa.me/919727413309](https://wa.me/919727413309) |
 | 📧 Email | [3goldenlotusroots@gmail.com](mailto:3goldenlotusroots@gmail.com) |
-| 🔴 YouTube | [@SNTL84](https://youtube.com/@SNTL84) |
 | 🤖 Aratt.ai | [@desidevloper](https://aratt.ai/user/@desidevloper) |
 
 ---
