@@ -69,6 +69,85 @@ When I respond to an open issue, I:
 
 <div align="center">
 
+### 🟢 [`nodejs/undici`](https://github.com/nodejs/undici) · Issue [#1373](https://github.com/nodejs/undici/issues/1373) · **PR [#5467](https://github.com/nodejs/undici/pull/5467)**
+
+**`Default fetch timeout too short — Regression test for 300s headersTimeout default`**
+
+![Node.js](https://img.shields.io/badge/Node.js-undici_fetch-339933?style=flat-square&logo=nodedotjs&logoColor=white)
+![Status](https://img.shields.io/badge/Status-PR_Open_%235467-01696f?style=flat-square)
+![Effort](https://img.shields.io/badge/Effort-~3_Hours-yellow?style=flat-square)
+![Priority](https://img.shields.io/badge/Impact-MEDIUM-orange?style=flat-square)
+![Label](https://img.shields.io/badge/Label-good_first_issue-7057ff?style=flat-square)
+![Session](https://img.shields.io/badge/Session-Jun_30_2026-4f98a3?style=flat-square)
+
+> 🟢 **Node.js core HTTP client bug** — undici's default `headersTimeout` was 30s (vs Chrome's 300s), causing silent failures for slow upstream APIs. The fix existed in source but had no regression test. This session added the missing test and a PR to lock in the 300s default permanently.
+
+</div>
+
+---
+
+### 📋 Session Timeline — Jun 30, 2026
+
+| Time (IST) | Action | Link |
+|------------|--------|------|
+| 3:58 PM | 🔍 Issue read & root cause confirmed | [Issue #1373](https://github.com/nodejs/undici/issues/1373) |
+| 4:00 PM | 💬 Triage comment posted — citations to 4 source files, test case, PR offer | [Comment →](https://github.com/nodejs/undici/issues/1373#issuecomment-4842427744) |
+| 4:02 PM | 🔎 Code search — confirmed `300e3` defaults in `types/client.d.ts`, `Client.md`, `symbols.js` | [client.d.ts →](https://github.com/nodejs/undici/blob/main/types/client.d.ts) |
+| 4:04 PM | 🍴 Fork initiated — `nodejs/undici` → `SNTL84/undici` | [Fork →](https://github.com/SNTL84/undici) |
+| 4:04 PM | 🌿 Branch created — `fix/issue-1373-default-timeout-test` | [Branch →](https://github.com/SNTL84/undici/tree/fix/issue-1373-default-timeout-test) |
+| 4:04 PM | 🧪 Regression test committed — `test/issue-1373-default-timeout.js` | [File →](https://github.com/SNTL84/undici/blob/fix/issue-1373-default-timeout-test/test/issue-1373-default-timeout.js) |
+| 4:06 PM | 🚀 PR opened → `nodejs/undici:main` | [PR #5467 →](https://github.com/nodejs/undici/pull/5467) |
+| 4:06 PM | 📝 PR linkback comment posted on issue thread | [Comment →](https://github.com/nodejs/undici/issues/1373#issuecomment-4842448990) |
+| 4:11 PM | 📋 Triage record added to open-issue-triage | [This record →](https://github.com/SNTL84/open-issue-triage/blob/main/triages/nodejs-undici-1373-default-timeout-regression.md) |
+
+---
+
+### 🔎 Root Cause — `headersTimeout` 30s → 300s with no regression guard
+
+```js
+// ❌ BEFORE — old default (caused issue #1373)
+headersTimeout: 30_000  // 30s — too aggressive for slow upstream APIs
+
+// ✅ AFTER — current default (Chrome-aligned)
+headersTimeout: 300_000 // 300s — matches browser fetch behaviour
+
+// ❌ MISSING — no test to prevent silent regression
+// ✅ THIS PR adds:
+test('default headersTimeout is 300s', async () => {
+  // server responds after 35s — must NOT throw HeadersTimeoutError
+  const res = await fetch(`http://localhost:${port}/`)
+  assert.equal(res.status, 200)
+})
+```
+
+---
+
+### 🔗 All Links — undici Session
+
+| Asset | Link |
+|-------|------|
+| 📌 Issue | [nodejs/undici #1373](https://github.com/nodejs/undici/issues/1373) |
+| 💬 Triage Comment | [#issuecomment-4842427744](https://github.com/nodejs/undici/issues/1373#issuecomment-4842427744) |
+| 📎 PR Linkback | [#issuecomment-4842448990](https://github.com/nodejs/undici/issues/1373#issuecomment-4842448990) |
+| 🍴 Fork | [SNTL84/undici](https://github.com/SNTL84/undici) |
+| 🌿 Branch | [fix/issue-1373-default-timeout-test](https://github.com/SNTL84/undici/tree/fix/issue-1373-default-timeout-test) |
+| 🧪 Test File | [test/issue-1373-default-timeout.js](https://github.com/SNTL84/undici/blob/fix/issue-1373-default-timeout-test/test/issue-1373-default-timeout.js) |
+| 🚀 Pull Request | [nodejs/undici #5467](https://github.com/nodejs/undici/pull/5467) |
+| 📋 Triage Record | [triages/nodejs-undici-1373-default-timeout-regression.md](https://github.com/SNTL84/open-issue-triage/blob/main/triages/nodejs-undici-1373-default-timeout-regression.md) |
+
+---
+
+### 🏷️ CTA Watermark
+
+> **SNTL 84** | Agentic AI Workflow Professional
+> Full-Stack Builds · AI Workflows · Lead Generation Automation · Supply Chain BI
+>
+> 🌐 [desidevloper.com](https://desidevloper.com) · 💬 [WhatsApp](https://wa.me/919727413309) · 🔗 [LinkedIn](https://linkedin.com/in/sntl2784) · 📸 [Instagram @desibiztrade](https://www.instagram.com/desibiztrade) · 🔴 [YouTube @SNTL84](https://youtube.com/@SNTL84) · 💻 [GitHub SNTL84](https://github.com/SNTL84)
+
+---
+
+<div align="center">
+
 ### ⚛️ [`calcom/cal.diy`](https://github.com/calcom/cal.diy) · Issue [#28979](https://github.com/calcom/cal.com/issues/28979) · **PR [#29643](https://github.com/calcom/cal.diy/pull/29643)**
 
 **`[embed-react] config/theme prop silently ignored after initial mount — useRef guard short-circuits reactive updates`**
@@ -111,58 +190,26 @@ useEffect(() => {
   initializedRef.current = true;
   Cal("inline", { elementOrSelector: element, calLink, config });
 }, [Cal, calLink, config, namespace, calOrigin, initConfig]);
-//                ^^^^^^
-// config IS in dep array — React re-runs correctly
-// BUT guard returns early every time → dep entry is a no-op
 ```
-
-**The `initializedRef` guard is correct for preventing double-init (React Strict Mode) but wrong as a general re-run gate.**
 
 ---
 
 ### ✅ The Fix — Split Effects
 
 ```tsx
-// ✅ AFTER — Effect 1: One-time init (guard valid here)
-// config + calLink intentionally excluded from deps
+// ✅ Effect 1: One-time init
 useEffect(() => {
   if (!Cal || initializedRef.current || !ref.current) return;
   initializedRef.current = true;
   Cal("inline", { elementOrSelector: element, calLink, config });
-}, [Cal, namespace, calOrigin, initConfig]); // ← config excluded
+}, [Cal, namespace, calOrigin, initConfig]);
 
-// ✅ Effect 2: Reactive config/calLink updates (no guard)
+// ✅ Effect 2: Reactive config updates
 useEffect(() => {
-  if (!Cal || !initializedRef.current) return; // skip before init
-  Cal("ui", { ...config }); // update embed without remount or iframe flash
-}, [Cal, namespace, config, calLink]); // ← config reactive here
+  if (!Cal || !initializedRef.current) return;
+  Cal("ui", { ...config });
+}, [Cal, namespace, config, calLink]);
 ```
-
-**Why this wins:**
-
-| Approach | Init safety | Config reactive | UX flash | Code clarity |
-|----------|------------|-----------------|----------|--------------|
-| ❌ Original (single effect + guard) | ✅ | ❌ Silent fail | None | ⚠️ Misleading deps |
-| ⚠️ `key={resolvedTheme}` workaround | ✅ | ✅ | ❌ iframe reload | ⚠️ Caller burden |
-| ✅ **Split effects (this PR)** | ✅ | ✅ | ✅ None | ✅ Clean separation |
-
----
-
-### 📦 Files Changed
-
-| File | Change |
-|------|--------|
-| `packages/embeds/embed-react/src/Cal.tsx` | Split single `useEffect` → 2 effects: init-only + reactive config update |
-
----
-
-### 🧪 Test Plan (in PR)
-
-- [ ] Mount `<Cal calLink="demo" config={{ theme: "light" }} />`
-- [ ] Change `config.theme` to `"dark"` while mounted — embed updates **without iframe reload**
-- [ ] Init fires exactly **once** — no double-init on config change
-- [ ] React Strict Mode double-invocation safe
-- [ ] `namespace` prop path works identically in both effects
 
 ---
 
@@ -206,57 +253,6 @@ useEffect(() => {
 **[📌 View Full Solution + Live Comment →](https://github.com/type-challenges/type-challenges/issues/38224#issuecomment-4797379914)**
 
 </div>
-
----
-
-### 🔎 Root Cause & Enhancement Over Existing Answers
-
-**Challenge:** `MinusOne<T>` — given a positive integer type `T`, return `T - 1`
-
-**Existing approach weakness (issue #38224 original):**
-
-| Gap | Problem |
-|-----|----------|
-| `MinusOne<0>` | No guard — borrow propagates infinitely into `""` → `never` chain |
-| `SplitLast` helper | Tightly coupled, not reusable across other challenge types |
-| No annotation | Mental model absent — hard for learners to follow |
-| TS 4.8 shorthand | Underutilized — verbose `infer` chains where shorthand applies |
-
-**The enhanced solution:**
-
-```ts
-type PrevDigit = {
-  '0': '9'; '1': '0'; '2': '1'; '3': '2'; '4': '3';
-  '5': '4'; '6': '5'; '7': '6'; '8': '7'; '9': '8';
-}
-
-type SplitTail<S extends string, Head extends string = ""> =
-  S extends `${infer F}${infer R}`
-    ? R extends ""
-      ? [Head, F]
-      : SplitTail<R, `${Head}${F}`>
-    : never
-
-type SubtractOne<S extends string> =
-  SplitTail<S> extends [infer H extends string, infer L extends string]
-    ? L extends '0'
-      ? H extends "" ? never : `${SubtractOne<H>}9`
-      : L extends keyof PrevDigit ? `${H}${PrevDigit[L]}` : never
-    : never
-
-type TrimZeros<S extends string> =
-  S extends `0${infer R}` ? R extends "" ? "0" : TrimZeros<R> : S
-
-type MinusOne<T extends number> =
-  T extends 0 ? never
-    : `${T}` extends infer S extends string
-      ? TrimZeros<SubtractOne<S>> extends infer R extends string
-        ? R extends `${infer N extends number}` ? N : never
-        : never
-      : never
-```
-
-**[📌 View Live Comment on type-challenges →](https://github.com/type-challenges/type-challenges/issues/38224#issuecomment-4797379914)**
 
 ---
 
@@ -327,6 +323,15 @@ type MinusOne<T extends number> =
 
 > Sorted newest → oldest. Every entry links directly to the live comment.
 
+### 🟢 [nodejs/undici](https://github.com/nodejs/undici)
+> Node.js core HTTP/1.1 client — powers the built-in `fetch` in Node.js 18+
+
+| # | Issue | Type | My Response | PR | Date |
+|---|-------|------|-------------|-----|------|
+| [#1373](https://github.com/nodejs/undici/issues/1373) | Default `headersTimeout` 30s too short — regression test for 300s default | 🟢 Node.js / HTTP / Test | [Triage Comment →](https://github.com/nodejs/undici/issues/1373#issuecomment-4842427744) | [PR #5467 →](https://github.com/nodejs/undici/pull/5467) | Jun 30, 2026 |
+
+---
+
 ### ⚛️ [calcom/cal.diy](https://github.com/calcom/cal.diy)
 > Open-source scheduling infrastructure — used by thousands of teams & developers globally
 
@@ -372,9 +377,10 @@ type MinusOne<T extends number> =
 
 | Metric | Count |
 |--------|-------|
-| Repos Contributed To | **4** |
-| Issues Triaged | **9** |
-| PRs Submitted | **2** (Velocity #25 ✅ merged · cal.diy #29643 🔥 open) |
+| Repos Contributed To | **5** |
+| Issues Triaged | **10** |
+| PRs Submitted | **3** (Velocity #25 ✅ merged · cal.diy #29643 🔥 open · undici #5467 🔥 open) |
+| Node.js Core Issues | **1** |
 | TypeScript Issues | 4 |
 | React / Embed Issues | **1** |
 | Architecture / Discussion | 2 |
@@ -386,45 +392,54 @@ type MinusOne<T extends number> =
 
 ## 💡 Response Highlights
 
+### 🟢 #1373 — Default fetch timeout too short (nodejs/undici)
+**Reframed as:** A regression safety gap — the 30s→300s fix was applied but never locked in with a test, leaving the door open for silent regressions in Node.js core.
+**Contributions this session:**
+- 💬 Triage comment with citations to 4 live source files (`types/client.d.ts`, `Client.md`, `client-h1.js`, `symbols.js`)
+- 🍴 Fork: `nodejs/undici` → `SNTL84/undici`
+- 🌿 Branch: `fix/issue-1373-default-timeout-test`
+- 🧪 Regression test `test/issue-1373-default-timeout.js` — 35s slow server, asserts no `HeadersTimeoutError`
+- 🚀 PR #5467 opened to `nodejs/undici:main`
+- 📝 PR linkback posted in issue thread
+
+---
+
 ### ⚛️ #28979 — embed-react config/theme prop ignored after mount (calcom/cal.diy)
-**Reframed as:** A React hooks lifecycle correctness issue — the `useRef` guard pattern is valid for preventing double-init but incorrectly applied as a general effect gate, silently invalidating the dep array's reactive purpose.
+**Reframed as:** A React hooks lifecycle correctness issue — the `useRef` guard pattern is valid for preventing double-init but incorrectly applied as a general effect gate.
 **Contributions this session:**
 - 💬 Maintainer-level triage comment with 3-tier fix options, test case specs, and file-level change table
-- 🍴 Fork: `calcom/cal.diy` → `SNTL84/cal.diy`
-- 🌿 Branch: `fix/embed-react-config-prop-ignored-after-mount`
-- 🔧 Actual source fix committed to `packages/embeds/embed-react/src/Cal.tsx` — split into 2 `useEffect` hooks
-- 🚀 Draft PR #29643 opened to `calcom/cal.diy` with full root cause, fix rationale, comparison table, and test plan
-- 👤 Profile README updated with `@calcom/embed-react Specialist` badge and session record
+- 🍴 Fork + branch + actual source fix committed
+- 🚀 Draft PR #29643 opened with full root cause, comparison table, and test plan
 
 ---
 
 ### 🧩 #38224 — MinusOne Enhanced Solution (type-challenges)
-**Reframed as:** A TypeScript type arithmetic problem requiring string-level decimal borrow propagation — not just a formatter but a reusable type utility system.
-**Contribution:** Enhanced community answer with `T=0` guard, generic `SplitTail` helper, TS 4.8 shorthand, complete JSDoc mental model, and comparison table vs existing answers.
+**Reframed as:** A TypeScript type arithmetic problem requiring string-level decimal borrow propagation.
+**Contribution:** Enhanced community answer with `T=0` guard, generic `SplitTail`, TS 4.8 shorthand, full annotation.
 
 ---
 
 ### 🔒 #575 — Remove `any` from Chart Formatter Props (petChain-Frontend)
-**Reframed as:** Type safety debt in Recharts integration — `any` propagation silently allows runtime type mismatches on currency values and label render calculations.
-**Contribution:** Dual-option fix for `FinancialReportChart`, minimal local interface strategy for `PetHealthChart`, `eslint-disable` removal, approach comparison table.
+**Reframed as:** Type safety debt in Recharts integration.
+**Contribution:** Dual-option fix, minimal local interface strategy, `eslint-disable` removal, approach comparison table.
 
 ---
 
 ### 🧹 #595 — Console Logging Cleanup in `usePWA.ts` (petChain-Frontend)
-**Reframed as:** Production hygiene issue — unconditional debug logs expose internal messaging and inflate error monitoring noise.
-**Contribution:** Full root cause triage with exact line numbers, dual-fix spec with before/after code blocks, alignment to existing `_app.tsx` gating pattern.
+**Reframed as:** Production hygiene issue.
+**Contribution:** Full root cause triage, dual-fix spec with before/after blocks, alignment to existing `_app.tsx` gating pattern.
 
 ---
 
 ### 🏗️ #23 — Agentic IDE Architecture (Velocity)
-**Reframed as:** Runtime boundary problem, not a forking problem.
+**Reframed as:** Runtime boundary problem.
 **Contribution:** Full architectural diagram showing Editor / Agentic / Orchestration Layer separation.
 
 ---
 
 ### 🐛 #17 — Missing Artifacts Directory Breaks Build (Velocity)
 **Reframed as:** Missing module regression with no guard in CI.
-**Contribution:** Traced ESM import chain, created full regression test suite (6 vitest tests), submitted **[PR #25](https://github.com/ishandutta2007/Velocity/pull/25)** — merged ✅.
+**Contribution:** Traced ESM import chain, 6 vitest tests, **[PR #25](https://github.com/ishandutta2007/Velocity/pull/25)** — merged ✅.
 
 ---
 
